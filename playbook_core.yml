@@ -18,20 +18,18 @@
       pacman:
         update_cache: yes
         name:
+          - emacs                   # best editor
           - nano                    # editor
-          - micro                   # editor
           - man-db                  # help pages
           - git                     # to clone github repos
           - curl                    # download utility
           - wget                    # download utility
           - rsync                   # copy utility
-          - nnn                     # file manager
           - fd                      # simpler find
           - fzf                     # fuzzy filter, useful for file search
           - bat                     # prettier cat
           - tree                    # show files/directories structure
           - unarchiver              # extract any archive
-          - fastfetch               # system info
           - duf                     # prettier df
           - ncdu                    # investigate disk usage
           - htop                    # resource monitor
@@ -166,17 +164,6 @@
         enabled: yes
         state: started
 
-# NNN ------------------------------------------------------------------------
-
-    - name: install nnn
-      pacman:
-        name:
-          - nnn
-
-    - name: install nnn plugins
-      become: no
-      shell: "curl -Ls https://raw.githubusercontent.com/jarun/nnn/master/plugins/getplugs | sh"
-
 # LOCATE THE QUICK FILE SEARCH  ----------------------------------------------
 
     - name: install plocate
@@ -191,17 +178,17 @@
         state: started
 
 # CRONIE  --------------------------------------------------------------------
-
-    - name: install cronie
-      pacman:
-        name:
-          - cronie
-
-    - name: enable and start cronie.service
-      systemd:
-        name: cronie
-        enabled: yes
-        state: started
+#
+#    - name: install cronie
+#      pacman:
+#        name:
+#          - cronie
+#
+#    - name: enable and start cronie.service
+#      systemd:
+#        name: cronie
+#        enabled: yes
+#        state: started
 
 # ARCHLINUX-KEYRING WEEKLY UPDATE  -------------------------------------------
 
@@ -225,42 +212,42 @@
         state: started
 
 # TRASH SETUP ----------------------------------------------------------------
-
-    - name: install trash-cli
-      pacman:
-        name:
-          - trash-cli
-
-    - name: create trash-empty.service file
-      copy:
-        dest: '/etc/systemd/system/trash-empty.service'
-        content: |
-          [Unit]
-          Description=Empty trash older than 30 days
-
-          [Service]
-          Type=oneshot
-          ExecStart=/usr/bin/trash-empty 30
-
-    - name: create trash-empty.timer file
-      copy:
-        dest: '/etc/systemd/system/trash-empty.timer'
-        content: |
-          [Unit]
-          Description=Empty trash older than 30 days daily
-
-          [Timer]
-          OnCalendar=daily
-          Persistent=true
-
-          [Install]
-          WantedBy=timers.target
-
-    - name: enable and start trash-empty.timer
-      systemd:
-        name: trash-empty.timer
-        enabled: yes
-        state: started
+#
+#    - name: install trash-cli
+#      pacman:
+#        name:
+#          - trash-cli
+#
+#    - name: create trash-empty.service file
+#      copy:
+#        dest: '/etc/systemd/system/trash-empty.service'
+#        content: |
+#          [Unit]
+#          Description=Empty trash older than 30 days
+#
+#          [Service]
+#          Type=oneshot
+#          ExecStart=/usr/bin/trash-empty 30
+#
+#    - name: create trash-empty.timer file
+#      copy:
+#        dest: '/etc/systemd/system/trash-empty.timer'
+#        content: |
+#          [Unit]
+#          Description=Empty trash older than 30 days daily
+#
+#          [Timer]
+#          OnCalendar=daily
+#          Persistent=true
+#
+#          [Install]
+#          WantedBy=timers.target
+#
+#    - name: enable and start trash-empty.timer
+#      systemd:
+#        name: trash-empty.timer
+#        enabled: yes
+#        state: started
 
 # CACHE CLEANER SCHEDULED  ---------------------------------------------------
 
@@ -288,7 +275,7 @@
         content: |
           --save /etc/pacman.d/mirrorlist
           --protocol http
-          --country SK,CZ
+          --country DE,FR
           --score 20
           --sort rate
 
@@ -413,27 +400,5 @@
       when:
           - ansible_facts['virtualization_role'] == 'guest'
           - ansible_facts['virtualization_type'] == 'virtualbox'
-
-# SETUP MICRO TEXT EDITOR  ---------------------------------------------------
-
-    - name: install micro text editor
-      pacman:
-        name:
-          - micro
-
-    - name: copy config directory with prefernces, hotkeys, syntax highlight
-      become: no
-      copy:
-        src: .config/micro
-        dest: ~/.config
-        mode: 0644
-
-    - name: set default editor in .bashrc
-      become: no
-      blockinfile:
-        path: ~/.bashrc
-        block: |
-          export EDITOR=micro
-          export VISUAL=micro
 
 #  ---------------------------------------------------------------------------
