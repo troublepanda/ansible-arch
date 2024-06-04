@@ -52,7 +52,7 @@
           - python-pip              # package manager
           - python-setuptools       # additional packaging tools
           - python-pexpect          # child application control
-          - debugedit               # required to install yay
+          - base-devel              # required to install yay
 
 # YAY TO ACCESS AUR REPOSITORY  ----------------------------------------------
 
