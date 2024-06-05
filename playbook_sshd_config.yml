@@ -1,0 +1,38 @@
+- name: configure the ssh server
+  hosts: all
+  become: yes
+
+  vars:
+    sshd_config_path: "/etc/ssh/sshd_config"
+
+  tasks:
+    - name: Insert my ssh public key
+      ansible.posix.authorized_key:
+        user: thomas
+        state: present
+        key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDREwDktKAvLTsmNLOs3cNf29ir7+oUPxuV54U\
+/+puQCwqFvVcZF7ay8RwgURFu62lf+07vVf0VjK49ziQL3psuwYZ/r+FDIdPqNLVtWJ4kxq5Yr55Mqp3MC8r+7Fjz\
+B1YXzeZ8OmWkF+krTqyqTSsQNT7znC/kflwjB4zvDhe2ZrtpZwvOpceCdHzjC8pGUGDGs32GlZSqdsGPCl+6x+SdI\
+jn0R8aZRUjk4D6Z/0SUz/krH/suYeFnEBnc1b9n9uW0EnRYi/egn9kSV0/9hMy8gcUhaXTXUkEULA9azOroe0Ik4u\
+ueS36gG1lGDhVsYA7lQNZk4zruZNr2V2TkONRn thomas@thinkbox"
+
+    - name: Disable password authentication
+      block:
+        - name: Remove PasswordAuthentication lines
+          lineinfile:
+            path: "{{ sshd_config_path }}"
+            search_string: 'PasswordAuthentication'
+            state: absent
+            validate: sshd -t -f %s
+        - name: Add disable statement
+          lineinfile:
+            path: "{{ sshd_config_path }}"
+            state: present
+            line: 'PasswordAuthentication no'
+            insertafter: "EOF"
+            validate: sshd -t -f %s
+        - name: restart sshd
+          service:
+            name: sshd
+            state: reloaded
+  
